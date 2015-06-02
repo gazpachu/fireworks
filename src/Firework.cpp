@@ -3,7 +3,7 @@
 Firework::Firework()
 {
     color.set(ofRandom(255), ofRandom(255), ofRandom(255));
-    //color.setHue( ofRandom(100) );
+    color.setHue( ofRandom(100) );
 
     bArrive = false;
 }
@@ -60,9 +60,9 @@ void Firework::update()
                 Particle myParticle;
                 myParticle.set( dst );
                 myParticle.color.set(color);
-                //myParticle.color.setHue(  myParticle.color.getHue() + ofRandom(-0.05,0.05) );
-                //myParticle.color.setSaturation(  ofRandom(0.5,1.0) );
-                //myParticle.color.setBrightness(  ofRandom(0.5,1.0) );
+                myParticle.color.setHue(  myParticle.color.getHue() + ofRandom(-0.05,0.05) );
+                myParticle.color.setSaturation(  ofRandom(0.5,1.0) );
+                myParticle.color.setBrightness(  ofRandom(0.5,1.0) );
 
                 myParticle.trailLength = ofRandom(10,60);
                 myParticle.damping = ofRandom(0.001, 0.05);

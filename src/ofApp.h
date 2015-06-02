@@ -2,7 +2,7 @@
 #include "ofMain.h"
 #include "ofxOpenNI.h"
 #include "ofTrueTypeFont.h"
-#include "ofxBlurShader.h"
+#include "ofxBlur.h"
 #include "Firework.h"
 
 class ofApp : public ofBaseApp
@@ -12,8 +12,6 @@ class ofApp : public ofBaseApp
 		void setup();
 		void update();
 		void draw();
-
-		void reset();
 
 		void keyPressed(int key);
 		void keyReleased(int key);
@@ -25,27 +23,24 @@ class ofApp : public ofBaseApp
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        int nearThreshold, farThreshold, blurAmount;
+        int nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, skyVel;
         float strokeWidth;
-        bool started, blurEnabled, reseting;
+        bool started, blurEnabled;
 
         ofxOpenNIContext niContext;
-        ofxDepthGenerator niDepthGenerator;
-        ofxImageGenerator niImageGenerator;
-        ofxUserGenerator niUserGenerator;
+//        ofxDepthGenerator niDepthGenerator;
+//        ofxImageGenerator niImageGenerator;
+//        ofxUserGenerator niUserGenerator;
         ofxHandGenerator* niHandGenerator;
         ofxTrackedHand* tracked;
         ofxTrackedHand* tracked2;
 
         ofPoint lHand, lHandOld, rHand, rHandOld;
 
-        ofImage bg, star, tinkerbell;
+        ofImage bg, sky, sky2;
 
         ofTrueTypeFont font;
-
-		ofFbo rgbaFbo;
-		ofxBlurShader* blur;
-		ofShader shader;
+		ofxBlur blur;
 
 		vector<Firework> fireworks;
 

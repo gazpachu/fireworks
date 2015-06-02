@@ -3,7 +3,7 @@
 //------------------------------------------------------------
 Particle::Particle()
 {
-	set(0,0,0);
+    set(0,0,0);
     vel.set(ofRandom(-10,10), ofRandom(-10,10));
     acc.set(0,0,0);
 
@@ -39,6 +39,8 @@ void Particle::update()
 	while (trail.size() > trailLength ){
 		trail.erase(trail.begin());
 	}
+    
+    color.set(color.r + 0.005, color.g + 0.005, color.b + 0.005);
 }
 
 //------------------------------------------------------------
@@ -69,7 +71,7 @@ void Particle::draw()
 
         //  Once this object call ofMesh it's done you can draw it.
         //
-        ofSetColor(255);
+        //ofSetColor(255);
         lineMesh.draw();
     }
 

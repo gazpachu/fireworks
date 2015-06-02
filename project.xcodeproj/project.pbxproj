@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2023B85D1B1C920400130A2A /* ofxBlur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2023B85B1B1C920400130A2A /* ofxBlur.cpp */; };
 		20662B7D1B18707C00D9ECD5 /* Firework.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20662B761B18707C00D9ECD5 /* Firework.cpp */; };
 		20662B7E1B18707C00D9ECD5 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 20662B781B18707C00D9ECD5 /* main.cpp */; };
 		8013B7141A3798D900D0714D /* ofxDepthGenerator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8013B6FC1A3798D900D0714D /* ofxDepthGenerator.cpp */; };
@@ -35,7 +36,6 @@
 		8013B73B1A3798E500D0714D /* libXnVHandGenerator_1_5_2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8013B72D1A3798E400D0714D /* libXnVHandGenerator_1_5_2.dylib */; };
 		8013B73C1A3798E500D0714D /* libXnVNite_1_5_2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 8013B72E1A3798E400D0714D /* libXnVNite_1_5_2.dylib */; };
 		80A09F3B1A3717AB00807189 /* particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80A09F391A3717AB00807189 /* particle.cpp */; };
-		80A09F401A3719B500807189 /* ofxBlurShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 80A09F3D1A3719B500807189 /* ofxBlurShader.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -87,6 +87,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2023B85B1B1C920400130A2A /* ofxBlur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ofxBlur.cpp; path = ../ofxBlur/ofxBlur.cpp; sourceTree = "<group>"; };
+		2023B85C1B1C920400130A2A /* ofxBlur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ofxBlur.h; path = ../ofxBlur/ofxBlur.h; sourceTree = "<group>"; };
 		20662B761B18707C00D9ECD5 /* Firework.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Firework.cpp; sourceTree = "<group>"; };
 		20662B771B18707C00D9ECD5 /* Firework.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Firework.h; sourceTree = "<group>"; };
 		20662B781B18707C00D9ECD5 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -260,8 +262,6 @@
 		8013B72E1A3798E400D0714D /* libXnVNite_1_5_2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libXnVNite_1_5_2.dylib; sourceTree = "<group>"; };
 		80A09F391A3717AB00807189 /* particle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = particle.cpp; sourceTree = "<group>"; };
 		80A09F3A1A3717AB00807189 /* particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particle.h; sourceTree = "<group>"; };
-		80A09F3D1A3719B500807189 /* ofxBlurShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBlurShader.cpp; sourceTree = "<group>"; };
-		80A09F3E1A3719B500807189 /* ofxBlurShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBlurShader.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -592,8 +592,8 @@
 		80A09F3C1A3719B500807189 /* ofxBlurShader */ = {
 			isa = PBXGroup;
 			children = (
-				80A09F3D1A3719B500807189 /* ofxBlurShader.cpp */,
-				80A09F3E1A3719B500807189 /* ofxBlurShader.h */,
+				2023B85B1B1C920400130A2A /* ofxBlur.cpp */,
+				2023B85C1B1C920400130A2A /* ofxBlur.h */,
 			);
 			name = ofxBlurShader;
 			path = ../../../addons/ofxBlurShader;
@@ -791,9 +791,9 @@
 				80A09F3B1A3717AB00807189 /* particle.cpp in Sources */,
 				8013B7141A3798D900D0714D /* ofxDepthGenerator.cpp in Sources */,
 				8013B7171A3798D900D0714D /* ofxHardwareDriver.cpp in Sources */,
-				80A09F401A3719B500807189 /* ofxBlurShader.cpp in Sources */,
 				8013B71B1A3798D900D0714D /* ofxOpenNIRecorder.cpp in Sources */,
 				8013B71C1A3798D900D0714D /* ofxTrackedHand.cpp in Sources */,
+				2023B85D1B1C920400130A2A /* ofxBlur.cpp in Sources */,
 				8013B7151A3798D900D0714D /* ofxGestureGenerator.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

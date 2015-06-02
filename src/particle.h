@@ -16,6 +16,9 @@ class Particle : public ofPoint
         ofFloatColor color;
 
         ofPoint vel, acc;
+    
+        float r,g,b;
+
 
         float trailLength, damping, size;
 
