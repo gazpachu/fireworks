@@ -40,6 +40,7 @@ void Particle::update()
 		trail.erase(trail.begin());
 	}
     
+    // Fade to white slowly
     color.set(color.r + 0.005, color.g + 0.005, color.b + 0.005);
 }
 

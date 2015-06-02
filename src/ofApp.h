@@ -23,28 +23,25 @@ class ofApp : public ofBaseApp
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        int nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, skyVel;
-        float strokeWidth;
+        int lSensor, rSensor, nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, cloudPos, cloud2Pos, cloud3Pos;
+        float strokeWidth, skyVel, cloudVel;
         bool started, blurEnabled;
 
         ofxOpenNIContext niContext;
-//        ofxDepthGenerator niDepthGenerator;
-//        ofxImageGenerator niImageGenerator;
-//        ofxUserGenerator niUserGenerator;
         ofxHandGenerator* niHandGenerator;
         ofxTrackedHand* tracked;
         ofxTrackedHand* tracked2;
 
         ofPoint lHand, lHandOld, rHand, rHandOld;
 
-        ofImage bg, sky, sky2;
+        ofImage bg, sky, sky2, cloud, cloud2, cloud3, logo;
 
         ofTrueTypeFont font;
 		ofxBlur blur;
 
 		vector<Firework> fireworks;
-
-		int lSensor, rSensor;
+    
+        ofSoundPlayer  crowd, finale;
 };
 
 

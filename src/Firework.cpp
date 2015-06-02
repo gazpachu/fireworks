@@ -6,6 +6,7 @@ Firework::Firework()
     color.setHue( ofRandom(100) );
 
     bArrive = false;
+    vignette = 200;
 }
 
 void Firework::init(int _x, int _y)
@@ -20,12 +21,14 @@ void Firework::init(int _x, int _y)
 
     gravityAmount = ofRandom(0.0, 0.5);
 
-    if( ofRandom(2) > 1 )
+    int start = ofRandom(2);
+    if( start == 1 )
         fireworksStart.loadSound("fireworks_start_1.mp3");
     else
         fireworksStart.loadSound("fireworks_start_2.mp3");
 
-    if( ofRandom(2) > 1 )
+    int end = ofRandom(2);
+    if( end == 1 )
         fireworksEnd.loadSound("fireworks_end_1.mp3");
     else
         fireworksEnd.loadSound("fireworks_end_2.mp3");
@@ -53,7 +56,7 @@ void Firework::update()
             //
             fireworksEnd.play();
 
-            int nParticles = ofRandom(50,70);
+            int nParticles = ofRandom(30,70);
 
             for (int i = 0; i < nParticles; i++)
             {
@@ -113,7 +116,7 @@ void Firework::draw()
     if( !bArrive )
     {
         ofSetColor(255);
-        ofCircle(pos, 2);
+        ofCircle(pos, 4);
     }
     else
     {
@@ -122,6 +125,10 @@ void Firework::draw()
             particles[i].draw();
         }
 
+        if (vignette > 0) {
+            ofBackgroundGradient(ofColor(0,0,0,0), ofColor(0,0,0,vignette), OF_GRADIENT_CIRCULAR);
+            vignette -= 50;
+        }
     }
 }
 

@@ -28,6 +28,7 @@ private:
 
     bool    bArrive;
     float gravityAmount;
+    int vignette;
 
     ofSoundPlayer  fireworksStart;
     ofSoundPlayer  fireworksEnd;

@@ -3,60 +3,62 @@
 //--------------------------------------------------------------
 void ofApp::setup()
 {
-	//ofBackground(0);
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
 
 	if( ! bg.loadImage("london-eye.png")) printf("Bg loading failed");
     if( ! sky.loadImage("sky.jpg")) printf("Sky loading failed");
     if( ! sky2.loadImage("sky.jpg")) printf("Sky loading failed");
+    if( ! cloud.loadImage("cloud.png")) printf("Cloud loading failed");
+    if( ! cloud2.loadImage("cloud2.png")) printf("Cloud loading failed");
+    if( ! cloud3.loadImage("cloud3.png")) printf("Cloud loading failed");
+    if( ! logo.loadImage("logo.png")) printf("Logo loading failed");
+    logo.resize(300, 300);
+
 	font.loadFont("bebasneue-webfont.ttf", 25);
+    
+    finale.loadSound("finale.mp3");
+    crowd.loadSound("crowd.mp3");
+    crowd.setLoop(true);
+    crowd.play();
     
     sky2.mirror(false, true);
     skyPos = 0;
+    cloudPos = ofGetWidth() + 300;
+    cloud2Pos = ofGetWidth() + 3000;
+    cloud3Pos = ofGetWidth() + 5200;
     sky2Pos = ofGetWidth();
-    skyVel = 4;
+    skyVel = 1;
+    cloudVel = 2;
 
 	nearThreshold = 100;
     farThreshold = 1300;
     strokeWidth = 8.0f;
-    blurAmount = 0;
+    blurAmount = 3;
 
     started = false;
-    blurEnabled = false;
+    blurEnabled = true;
 
 	niContext.setup();
-	//niContext.toggleRegisterViewport();
 	niContext.toggleMirror();
-
-    //niDepthGenerator.setup( &niContext );
-    //niImageGenerator.setup( &niContext );
-
-    //niDepthGenerator.setDepthThreshold(0, nearThreshold, farThreshold);
-
-    //niUserGenerator.setup( &niContext );
-    //niUserGenerator.setSmoothing(filterFactor); // built in openni skeleton smoothing...
-	//niUserGenerator.setMaxNumberOfUsers(1);
 
     niHandGenerator = new ofxHandGenerator();
 	niHandGenerator->setup(&niContext,2);
 	niHandGenerator->setMaxNumHands(2);
-	niHandGenerator->setSmoothing(0.0f); // built in openni hand track smoothing...
+	niHandGenerator->setSmoothing(0.0f);
 	//niHandGenerator->setFilterFactors(filterFactor); // custom smoothing/filtering (can also set per hand with setFilterFactor)...set them all to 0.1f to begin with
     //niHandGenerator->startTrackHands();
     
     blur.setup(ofGetWidth(), ofGetHeight(), blurAmount, .2, 4);
     
     //ofEnableAlphaBlending();
+    ofSetCircleResolution(64);
 }
 
 //--------------------------------------------------------------
 void ofApp::update()
 {
     niContext.update();
-    //niDepthGenerator.update();
-    //niImageGenerator.update();
-    //niUserGenerator.update();
 
     tracked = niHandGenerator->getHand(0);
     tracked2 = niHandGenerator->getHand(1);
@@ -104,6 +106,10 @@ void ofApp::update()
             rSensor = 200;
         }
         
+        if (fireworks.size() > 3) {
+            finale.play();
+        }
+        
         if( blurEnabled && started )
         {
             blur.setScale(ofMap(200, 0, ofGetWidth(), 0, blurAmount));
@@ -111,10 +117,11 @@ void ofApp::update()
         }
     }
     
-    
-    
     if (skyPos > -sky.getWidth() && sky2Pos > 0) {
         skyPos -= skyVel;
+        cloudPos -= cloudVel;
+        cloud2Pos -= cloudVel;
+        cloud3Pos -= cloudVel;
         
         if (skyPos < -(sky.getWidth() - ofGetWidth())) {
             sky2Pos -= skyVel;
@@ -122,11 +129,17 @@ void ofApp::update()
     }
     else if (sky2Pos >= 0) {
         skyPos = ofGetWidth();
+        cloudPos = ofGetWidth() + 300;
+        cloud2Pos = ofGetWidth() + 3000;
+        cloud3Pos = ofGetWidth() + 5200;
         sky2Pos -= skyVel;
     }
     
     if (sky2Pos > -sky2.getWidth() && skyPos > 0) {
         sky2Pos -= skyVel;
+        cloudPos -= cloudVel;
+        cloud2Pos -= cloudVel;
+        cloud3Pos -= cloudVel;
         
         if (sky2Pos < -(sky2.getWidth() - ofGetWidth())) {
             skyPos -= skyVel;
@@ -134,6 +147,9 @@ void ofApp::update()
     }
     else if (skyPos >= 0) {
         sky2Pos = ofGetWidth();
+        cloudPos = ofGetWidth() + 300;
+        cloud2Pos = ofGetWidth() + 2500;
+        cloud3Pos = ofGetWidth() + 5200;
         skyPos -= skyVel;
     }
 }
@@ -141,23 +157,24 @@ void ofApp::update()
 //--------------------------------------------------------------
 void ofApp::draw()
 {
-    if( blurEnabled && started )
-    {
+    if( blurEnabled ) {
         blur.begin();
     }
     
     ofSetColor(255,255,255);
+    
     sky.draw(skyPos,0);
     sky2.draw(sky2Pos,0);
-    
+    cloud.draw(cloudPos, 200);
+    cloud2.draw(cloud2Pos, 500);
+    cloud3.draw(cloud3Pos, 50);
     bg.draw(0,0);
+    
+    ofSetColor(255,255,255,70);
+    logo.draw((ofGetWidth()/2 - logo.width/2), (ofGetHeight()/2 - logo.height/2));
+    ofSetColor(255,255,255,255);
 
-    if( !started )
-    {
-        font.drawString("SHOW ME YOUR HAND TO START PLAYING", ofGetWidth()/2 - 50, ofGetHeight()/2);
-        font.drawString("(press spacebar to restart)", ofGetWidth()/2 - 50, ofGetHeight()/2 + 50);
-    }
-    else
+    if( started )
     {
         ofDrawBitmapString("Left Hand: " + ofToString(lHand.x) + ", " + ofToString(lHand.y), 20,20);
         ofDrawBitmapString("Right Hand: " + ofToString(rHand.x) + ", " + ofToString(rHand.y), 20,40);
@@ -172,37 +189,29 @@ void ofApp::draw()
         ofDrawBitmapString("Set Trail Width: '+/-'", ofGetWidth() - 200,80);
         ofDrawBitmapString("Restart: 'Spacebar'", ofGetWidth() - 200,100);
 
-        //star.draw(lHand.x, lHand.y);
-
-        
-
         for (int i = 0; i< fireworks.size(); i++)
             fireworks[i].draw();
-
-        if( blurEnabled && started )
-        {
-            blur.end();
-            blur.draw();
-        }
 
         if( lSensor > 0 )
         {
             lSensor = lSensor - 3;
             ofSetColor(255, 255, 255, lSensor);
-            ofSetCircleResolution(64);
             ofCircle(ofGetWidth() - 400, ofGetHeight() + 300, 400);
         }
         if( rSensor > 0 )
         {
             rSensor = rSensor - 3;
             ofSetColor(255, 255, 255, rSensor);
-            ofSetCircleResolution(64);
             ofCircle(400, ofGetHeight() + 300, 400);
         }
-
-        /*niDepthGenerator.draw(10, 200, 300, 200);
-        niImageGenerator.draw(10, 420, 300, 200);
-        niUserGenerator.draw(300,200);*/
+    }
+    
+    ofSetColor(255,255,255);
+    
+    if( blurEnabled )
+    {
+        blur.end();
+        blur.draw();
     }
 }
 
@@ -250,13 +259,13 @@ void ofApp::keyPressed(int key)
     if(key == 's')
     {
         if( skyVel < 10 )
-            skyVel++;
+            skyVel += 0.5;
     }
     
     if(key == 'd')
     {
         if( skyVel > 0 )
-            skyVel--;
+            skyVel -= 0.5;
     }
 
 	if(key == 32) //spacebar
