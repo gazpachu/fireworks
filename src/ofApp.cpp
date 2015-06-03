@@ -13,9 +13,12 @@ void ofApp::setup()
     if( ! cloud2.loadImage("cloud2.png")) printf("Cloud loading failed");
     if( ! cloud3.loadImage("cloud3.png")) printf("Cloud loading failed");
     if( ! logo.loadImage("logo.png")) printf("Logo loading failed");
-    logo.resize(300, 300);
+    if( ! hands.loadImage("hands.png")) printf("Hands loading failed");
+    
+    logo.resize(150, 150);
+    hands.resize(1390, 742);
 
-	font.loadFont("bebasneue-webfont.ttf", 25);
+	font.loadFont("bebasneue-webfont.ttf", 20);
     
     finale.loadSound("finale.mp3");
     crowd.loadSound("crowd.mp3");
@@ -34,20 +37,23 @@ void ofApp::setup()
 	nearThreshold = 100;
     farThreshold = 1300;
     strokeWidth = 8.0f;
-    blurAmount = 3;
+    blurAmount = 20;
+    startTime = 0;
+    currentTime = 0;
 
     started = false;
+    ready = false;
     blurEnabled = true;
 
 	niContext.setup();
 	niContext.toggleMirror();
 
     niHandGenerator = new ofxHandGenerator();
-	niHandGenerator->setup(&niContext,2);
-	niHandGenerator->setMaxNumHands(2);
+	niHandGenerator->setup(&niContext, 2);
 	niHandGenerator->setSmoothing(0.0f);
-	//niHandGenerator->setFilterFactors(filterFactor); // custom smoothing/filtering (can also set per hand with setFilterFactor)...set them all to 0.1f to begin with
     //niHandGenerator->startTrackHands();
+    //niHandGenerator->dropHands();
+	//niHandGenerator->setFilterFactors(filterFactor); // custom smoothing/filtering (can also set per hand with setFilterFactor)...set them all to 0.1f to begin with
     
     blur.setup(ofGetWidth(), ofGetHeight(), blurAmount, .2, 4);
     
@@ -62,12 +68,12 @@ void ofApp::update()
 
     tracked = niHandGenerator->getHand(0);
     tracked2 = niHandGenerator->getHand(1);
+    
+    //cout << tracked->projectPos.y << ", " << tracked2->projectPos.y << ", " << startTime << "/n";
 
-    if( ( tracked->projectPos.y || tracked2->projectPos.y ) )
-        started = true;
-
-    if( started )
+    if( tracked->projectPos.y || tracked2->projectPos.y )
     {
+        ready = true;
         ofSetLineWidth( ofRandom(15) );
 
         lHandOld.x = lHand.x;
@@ -95,6 +101,8 @@ void ofApp::update()
             fireworks.push_back( newFirework );
 
             lSensor = 200;
+            started = true;
+            currentTime = 0;
         }
 
         if( fireworks.size() < 20 && rHand.y + 50 < rHandOld.y )
@@ -104,19 +112,118 @@ void ofApp::update()
             fireworks.push_back( newFirework );
 
             rSensor = 200;
+            started = true;
+            currentTime = 0;
         }
         
         if (fireworks.size() > 3) {
             finale.play();
         }
         
-        if( blurEnabled && started )
+        if( started) {
+            blurAmount = 0;
+            currentTime++;
+            
+            if (currentTime > 300) {
+                currentTime = 0;
+                started = false;
+                blurAmount = 20;
+            }
+        }
+    }
+    else {
+        ready = false;
+    }
+    
+    if( blurEnabled )
+    {
+        blur.setScale(ofMap(200, 0, ofGetWidth(), 0, blurAmount));
+        blur.setRotation(ofMap(200, 0, ofGetHeight(), -PI, PI));
+    }
+    
+    updateSky();
+}
+
+//--------------------------------------------------------------
+void ofApp::draw()
+{
+    if( blurEnabled ) {
+        blur.begin();
+    }
+    
+    ofSetColor(255,255,255);
+    
+    sky.draw(skyPos,0);
+    sky2.draw(sky2Pos,0);
+    cloud.draw(cloudPos, 200);
+    cloud2.draw(cloud2Pos, 500);
+    cloud3.draw(cloud3Pos, 50);
+    bg.draw(0,0);
+    
+    ofSetColor(255,255,255,70);
+    logo.draw((ofGetWidth()/2 - logo.width/2), 50);
+    ofSetColor(255,255,255,255);
+
+    if( started && ready )
+    {
+//        ofDrawBitmapString("Left Hand: " + ofToString(lHand.x) + ", " + ofToString(lHand.y), 20,20);
+//        ofDrawBitmapString("Right Hand: " + ofToString(rHand.x) + ", " + ofToString(rHand.y), 20,40);
+//        ofDrawBitmapString("FPS: " + ofToString( ofGetFrameRate(), 2 ), 20, 60);
+//        ofDrawBitmapString("Blur status: " + ofToString( blurEnabled ), 20, 80);
+//        ofDrawBitmapString("Blur amount: " + ofToString( blurAmount ), 20, 100);
+//        ofDrawBitmapString("Trail width: " + ofToString( strokeWidth ), 20, 120);
+//
+//        ofDrawBitmapString("Toggle Fullscreen: 'F'", ofGetWidth() - 200,20);
+//        ofDrawBitmapString("Toggle Blur: 'B'", ofGetWidth() - 200,40);
+//        ofDrawBitmapString("Set Blur Amount: 'Q/W'", ofGetWidth() - 200,60);
+//        ofDrawBitmapString("Set Trail Width: '+/-'", ofGetWidth() - 200,80);
+//        ofDrawBitmapString("Restart: 'Spacebar'", ofGetWidth() - 200,100);
+
+        for (int i = 0; i< fireworks.size(); i++)
+            fireworks[i].draw();
+
+        if( lSensor > 0 )
         {
-            blur.setScale(ofMap(200, 0, ofGetWidth(), 0, blurAmount));
-            blur.setRotation(ofMap(200, 0, ofGetHeight(), -PI, PI));
+            lSensor = lSensor - 3;
+            ofSetColor(255, 255, 255, lSensor);
+            ofCircle(ofGetWidth() - 400, ofGetHeight() + 300, 400);
+            font.drawString("Right hand", ofGetWidth() - 440, ofGetHeight() - 40);
+        }
+        if( rSensor > 0 )
+        {
+            rSensor = rSensor - 3;
+            ofSetColor(255, 255, 255, rSensor);
+            ofCircle(400, ofGetHeight() + 300, 400);
+            font.drawString("Left hand", 360, ofGetHeight() - 40);
         }
     }
     
+    ofSetColor(255,255,255);
+    
+    if( blurEnabled )
+    {
+        blur.end();
+        blur.draw();
+    }
+    
+    if( !started )
+    {
+        logo.draw((ofGetWidth()/2 - logo.width/2), 50);
+        hands.draw((ofGetWidth()/2 - hands.width/2), 300);
+        
+        font.drawString("Sapient Fireworks", ofGetWidth()/2 - 85, 270);
+        font.drawString("A Kinect hand tracking demo", ofGetWidth()/2 - 137, 310);
+        font.drawString("First show your hands then throw the fireworks!", ofGetWidth()/2 - 245, ofGetHeight() - 80);
+        
+        glPushMatrix();
+        ofScale( 2.0f, 2.0f, 2.0f );
+        niHandGenerator->drawHands();
+        glPopMatrix();
+    }
+}
+
+void ofApp::updateSky()
+{
     if (skyPos > -sky.getWidth() && sky2Pos > 0) {
         skyPos -= skyVel;
         cloudPos -= cloudVel;
@@ -151,67 +258,6 @@ void ofApp::update()
         cloud2Pos = ofGetWidth() + 2500;
         cloud3Pos = ofGetWidth() + 5200;
         skyPos -= skyVel;
-    }
-}
-
-//--------------------------------------------------------------
-void ofApp::draw()
-{
-    if( blurEnabled ) {
-        blur.begin();
-    }
-    
-    ofSetColor(255,255,255);
-    
-    sky.draw(skyPos,0);
-    sky2.draw(sky2Pos,0);
-    cloud.draw(cloudPos, 200);
-    cloud2.draw(cloud2Pos, 500);
-    cloud3.draw(cloud3Pos, 50);
-    bg.draw(0,0);
-    
-    ofSetColor(255,255,255,70);
-    logo.draw((ofGetWidth()/2 - logo.width/2), (ofGetHeight()/2 - logo.height/2));
-    ofSetColor(255,255,255,255);
-
-    if( started )
-    {
-        ofDrawBitmapString("Left Hand: " + ofToString(lHand.x) + ", " + ofToString(lHand.y), 20,20);
-        ofDrawBitmapString("Right Hand: " + ofToString(rHand.x) + ", " + ofToString(rHand.y), 20,40);
-        ofDrawBitmapString("FPS: " + ofToString( ofGetFrameRate(), 2 ), 20, 60);
-        ofDrawBitmapString("Blur status: " + ofToString( blurEnabled ), 20, 80);
-        ofDrawBitmapString("Blur amount: " + ofToString( blurAmount ), 20, 100);
-        ofDrawBitmapString("Trail width: " + ofToString( strokeWidth ), 20, 120);
-
-        ofDrawBitmapString("Toggle Fullscreen: 'F'", ofGetWidth() - 200,20);
-        ofDrawBitmapString("Toggle Blur: 'B'", ofGetWidth() - 200,40);
-        ofDrawBitmapString("Set Blur Amount: 'Q/W'", ofGetWidth() - 200,60);
-        ofDrawBitmapString("Set Trail Width: '+/-'", ofGetWidth() - 200,80);
-        ofDrawBitmapString("Restart: 'Spacebar'", ofGetWidth() - 200,100);
-
-        for (int i = 0; i< fireworks.size(); i++)
-            fireworks[i].draw();
-
-        if( lSensor > 0 )
-        {
-            lSensor = lSensor - 3;
-            ofSetColor(255, 255, 255, lSensor);
-            ofCircle(ofGetWidth() - 400, ofGetHeight() + 300, 400);
-        }
-        if( rSensor > 0 )
-        {
-            rSensor = rSensor - 3;
-            ofSetColor(255, 255, 255, rSensor);
-            ofCircle(400, ofGetHeight() + 300, 400);
-        }
-    }
-    
-    ofSetColor(255,255,255);
-    
-    if( blurEnabled )
-    {
-        blur.end();
-        blur.draw();
     }
 }
 
@@ -270,13 +316,7 @@ void ofApp::keyPressed(int key)
 
 	if(key == 32) //spacebar
 	{
-	    started = false;
-        niHandGenerator->dropHands();
-
-        delete niHandGenerator;
-        niHandGenerator = new ofxHandGenerator();
-        niHandGenerator->setup(&niContext,1);
-        niHandGenerator->setMaxNumHands(2);
+	    
 	}
 }
 

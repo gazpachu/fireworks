@@ -13,6 +13,7 @@ class ofApp : public ofBaseApp
 		void update();
 		void draw();
 
+        void updateSky();
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -23,9 +24,9 @@ class ofApp : public ofBaseApp
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        int lSensor, rSensor, nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, cloudPos, cloud2Pos, cloud3Pos;
+        int lSensor, rSensor, nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, cloudPos, cloud2Pos, cloud3Pos, startTime, currentTime;
         float strokeWidth, skyVel, cloudVel;
-        bool started, blurEnabled;
+        bool started, ready, blurEnabled;
 
         ofxOpenNIContext niContext;
         ofxHandGenerator* niHandGenerator;
@@ -34,7 +35,7 @@ class ofApp : public ofBaseApp
 
         ofPoint lHand, lHandOld, rHand, rHandOld;
 
-        ofImage bg, sky, sky2, cloud, cloud2, cloud3, logo;
+        ofImage bg, sky, sky2, cloud, cloud2, cloud3, logo, hands;
 
         ofTrueTypeFont font;
 		ofxBlur blur;

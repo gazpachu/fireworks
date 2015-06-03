@@ -3,7 +3,7 @@
 Firework::Firework()
 {
     color.set(ofRandom(255), ofRandom(255), ofRandom(255));
-    color.setHue( ofRandom(100) );
+    //color.setHue( ofRandom(100) );
 
     bArrive = false;
     vignette = 200;
