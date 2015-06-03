@@ -24,9 +24,9 @@ class ofApp : public ofBaseApp
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-        int lSensor, rSensor, nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, cloudPos, cloud2Pos, cloud3Pos, startTime, currentTime;
+        int lSensor, rSensor, nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, cloudPos, cloud2Pos, cloud3Pos, currentTime, totalParticles, maxIdleTime;
         float strokeWidth, skyVel, cloudVel;
-        bool started, ready, blurEnabled;
+        bool started, ready, blurEnabled, showInfo;
 
         ofxOpenNIContext niContext;
         ofxHandGenerator* niHandGenerator;

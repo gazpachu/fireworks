@@ -10,11 +10,10 @@ public:
     Firework();
 
     void    init(int _x, int _y);
-
     bool    finish();
-
     void    update();
     void    draw();
+    int     getTotalParticles();
 
 private:
     vector<Particle> particles;

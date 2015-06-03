@@ -21,17 +21,21 @@ void Firework::init(int _x, int _y)
 
     gravityAmount = ofRandom(0.0, 0.5);
 
-    int start = ofRandom(2);
+    int start = ofRandom(3);
     if( start == 1 )
         fireworksStart.loadSound("fireworks_start_1.mp3");
-    else
+    else if( start == 2 )
         fireworksStart.loadSound("fireworks_start_2.mp3");
+    else
+        fireworksStart.loadSound("fireworks_start_3.mp3");
 
-    int end = ofRandom(2);
+    int end = ofRandom(3);
     if( end == 1 )
         fireworksEnd.loadSound("fireworks_end_1.mp3");
-    else
+    else if( end == 2 )
         fireworksEnd.loadSound("fireworks_end_2.mp3");
+    else
+        fireworksEnd.loadSound("fireworks_end_3.mp3");
 
     fireworksStart.setMultiPlay(true);
     fireworksEnd.setMultiPlay(true);
@@ -56,19 +60,19 @@ void Firework::update()
             //
             fireworksEnd.play();
 
-            int nParticles = ofRandom(30,70);
+            int nParticles = ofRandom(15,60);
 
             for (int i = 0; i < nParticles; i++)
             {
                 Particle myParticle;
                 myParticle.set( dst );
                 myParticle.color.set(color);
-                myParticle.color.setHue(  myParticle.color.getHue() + ofRandom(-0.05,0.05) );
-                myParticle.color.setSaturation(  ofRandom(0.5,1.0) );
-                myParticle.color.setBrightness(  ofRandom(0.5,1.0) );
+                //myParticle.color.setHue(  myParticle.color.getHue() + ofRandom(-0.05,0.05) );
+                //myParticle.color.setSaturation(  ofRandom(0.5,1.0) );
+                //myParticle.color.setBrightness(  ofRandom(0.5,1.0) );
 
-                myParticle.trailLength = ofRandom(10,60);
-                myParticle.damping = ofRandom(0.001, 0.05);
+                myParticle.trailLength = ofRandom(10,50);
+                myParticle.damping = ofRandom(0.001, 0.01);
 
                 particles.push_back(myParticle);
             }
@@ -95,7 +99,7 @@ void Firework::update()
             //  Erase particles that are not longer visible
             //  or update the ones that are
             //
-            if (particles[i].y > ofGetHeight() || particles[i].size < 0.1 ){
+            if (particles[i].y > ofGetHeight() || particles[i].size < 0.3 ){
                 particles.erase(particles.begin()+i);
             } else {
                 particles[i].addForce( gravity );
@@ -104,7 +108,7 @@ void Firework::update()
                 //  Reduce progressively the brighness, size and trail
                 //
                 //particles[i].color.setBrightness( particles[i].color.getBrightness() * 0.995 );
-                particles[i].size *= 0.995;
+                particles[i].size *= 0.998;
                 particles[i].trailLength *= 0.995;
             }
         }
@@ -130,6 +134,10 @@ void Firework::draw()
             vignette -= 50;
         }
     }
+}
+
+int Firework::getTotalParticles() {
+    return particles.size();
 }
 
 

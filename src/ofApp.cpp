@@ -38,12 +38,14 @@ void ofApp::setup()
     farThreshold = 1300;
     strokeWidth = 8.0f;
     blurAmount = 20;
-    startTime = 0;
+    totalParticles = 0;
     currentTime = 0;
+    maxIdleTime = 600;
 
     started = false;
     ready = false;
     blurEnabled = true;
+    showInfo = false;
 
 	niContext.setup();
 	niContext.toggleMirror();
@@ -85,6 +87,8 @@ void ofApp::update()
         rHandOld.y = rHand.y;
         rHand.x = tracked2->projectPos.x * (ofGetWidth() / 640);
         rHand.y = tracked2->projectPos.y * (ofGetHeight() / 480);
+        
+        totalParticles = 0;
 
         for( int i = fireworks.size()-1; i >=0; i-- )
         {
@@ -92,9 +96,11 @@ void ofApp::update()
                 fireworks.erase( fireworks.begin() + i );
             else
                 fireworks[i].update();
+            
+            totalParticles += fireworks[i].getTotalParticles();
         }
 
-        if( fireworks.size() < 20 && lHand.y + 50 < lHandOld.y )
+        if( fireworks.size() < 40 && lHand.y + 50 < lHandOld.y )
         {
             Firework newFirework;
             newFirework.init( lHand.x, lHand.y - 100 );
@@ -105,7 +111,7 @@ void ofApp::update()
             currentTime = 0;
         }
 
-        if( fireworks.size() < 20 && rHand.y + 50 < rHandOld.y )
+        if( fireworks.size() < 40 && rHand.y + 50 < rHandOld.y )
         {
             Firework newFirework;
             newFirework.init( rHand.x, rHand.y - 100 );
@@ -116,18 +122,24 @@ void ofApp::update()
             currentTime = 0;
         }
         
-        if (fireworks.size() > 3) {
+        if (fireworks.size() > 5 && !finale.getIsPlaying()) {
             finale.play();
+        }
+        
+        if (fireworks.size() < 2 && !crowd.getIsPlaying()) {
+            crowd.play();
         }
         
         if( started) {
             blurAmount = 0;
+            blurEnabled = false;
             currentTime++;
             
-            if (currentTime > 300) {
+            if (currentTime > maxIdleTime) {
                 currentTime = 0;
                 started = false;
                 blurAmount = 20;
+                blurEnabled = true;
             }
         }
     }
@@ -163,24 +175,36 @@ void ofApp::draw()
     ofSetColor(255,255,255,70);
     logo.draw((ofGetWidth()/2 - logo.width/2), 50);
     ofSetColor(255,255,255,255);
+    
+    if( blurEnabled )
+    {
+        blur.end();
+        blur.draw();
+    }
 
     if( started && ready )
     {
-//        ofDrawBitmapString("Left Hand: " + ofToString(lHand.x) + ", " + ofToString(lHand.y), 20,20);
-//        ofDrawBitmapString("Right Hand: " + ofToString(rHand.x) + ", " + ofToString(rHand.y), 20,40);
-//        ofDrawBitmapString("FPS: " + ofToString( ofGetFrameRate(), 2 ), 20, 60);
-//        ofDrawBitmapString("Blur status: " + ofToString( blurEnabled ), 20, 80);
-//        ofDrawBitmapString("Blur amount: " + ofToString( blurAmount ), 20, 100);
-//        ofDrawBitmapString("Trail width: " + ofToString( strokeWidth ), 20, 120);
-//
-//        ofDrawBitmapString("Toggle Fullscreen: 'F'", ofGetWidth() - 200,20);
-//        ofDrawBitmapString("Toggle Blur: 'B'", ofGetWidth() - 200,40);
-//        ofDrawBitmapString("Set Blur Amount: 'Q/W'", ofGetWidth() - 200,60);
-//        ofDrawBitmapString("Set Trail Width: '+/-'", ofGetWidth() - 200,80);
-//        ofDrawBitmapString("Restart: 'Spacebar'", ofGetWidth() - 200,100);
+        if (showInfo) {
+            ofDrawBitmapString("Left Hand: " + ofToString(lHand.x) + ", " + ofToString(lHand.y), 20,20);
+            ofDrawBitmapString("Right Hand: " + ofToString(rHand.x) + ", " + ofToString(rHand.y), 20,40);
+            ofDrawBitmapString("FPS: " + ofToString( ofGetFrameRate(), 2 ), 20, 60);
+            ofDrawBitmapString("Blur status: " + ofToString( blurEnabled ), 20, 80);
+            ofDrawBitmapString("Blur amount: " + ofToString( blurAmount ), 20, 100);
+            ofDrawBitmapString("Trail width: " + ofToString( strokeWidth ), 20, 120);
+            ofDrawBitmapString("Fireworks: " + ofToString( fireworks.size() ), 20, 140);
+            ofDrawBitmapString("Particles: " + ofToString( totalParticles ), 20, 160);
 
-        for (int i = 0; i< fireworks.size(); i++)
+            ofDrawBitmapString("Toggle Fullscreen: 'F'", ofGetWidth() - 200,20);
+            ofDrawBitmapString("Toggle Blur: 'B'", ofGetWidth() - 200,40);
+            ofDrawBitmapString("Set Blur Amount: 'Q/W'", ofGetWidth() - 200,60);
+            ofDrawBitmapString("Set Trail Width: '+/-'", ofGetWidth() - 200,80);
+            ofDrawBitmapString("Sky velocity: 'S/D'", ofGetWidth() - 200,100);
+            ofDrawBitmapString("Info: 'Spacebar'", ofGetWidth() - 200,120);
+        }
+        
+        for (int i = 0; i< fireworks.size(); i++) {
             fireworks[i].draw();
+        }
 
         if( lSensor > 0 )
         {
@@ -200,12 +224,6 @@ void ofApp::draw()
     
     ofSetColor(255,255,255);
     
-    if( blurEnabled )
-    {
-        blur.end();
-        blur.draw();
-    }
-    
     if( !started )
     {
         logo.draw((ofGetWidth()/2 - logo.width/2), 50);
@@ -213,12 +231,12 @@ void ofApp::draw()
         
         font.drawString("Sapient Fireworks", ofGetWidth()/2 - 85, 270);
         font.drawString("A Kinect hand tracking demo", ofGetWidth()/2 - 137, 310);
-        font.drawString("First show your hands then throw the fireworks!", ofGetWidth()/2 - 245, ofGetHeight() - 80);
+        font.drawString("Show your hands until you can move both green dots, then lift your hands to start your fireworks show!", ofGetWidth()/2 - 550, ofGetHeight() - 80);
         
-        glPushMatrix();
-        ofScale( 2.0f, 2.0f, 2.0f );
-        niHandGenerator->drawHands();
-        glPopMatrix();
+        ofFill();
+        ofSetColor(0, 255, 0);
+        ofCircle(lHand.x, lHand.y, 15);
+        ofCircle(rHand.x, rHand.y, 15);
     }
 }
 
@@ -292,7 +310,7 @@ void ofApp::keyPressed(int key)
 
 	if(key == 'w')
 	{
-	    if( blurAmount < 10 )
+	    if( blurAmount < 30 )
             blurAmount++;
 	}
 
@@ -316,7 +334,7 @@ void ofApp::keyPressed(int key)
 
 	if(key == 32) //spacebar
 	{
-	    
+        showInfo = !showInfo;
 	}
 }
 
