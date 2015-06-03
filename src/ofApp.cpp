@@ -5,8 +5,9 @@ void ofApp::setup()
 {
 	ofSetFrameRate(60);
 	ofSetVerticalSync(true);
-
-	if( ! bg.loadImage("london-eye.png")) printf("Bg loading failed");
+    
+    portrait = true;
+    
     if( ! sky.loadImage("sky.jpg")) printf("Sky loading failed");
     if( ! sky2.loadImage("sky.jpg")) printf("Sky loading failed");
     if( ! cloud.loadImage("cloud.png")) printf("Cloud loading failed");
@@ -15,8 +16,18 @@ void ofApp::setup()
     if( ! logo.loadImage("logo.png")) printf("Logo loading failed");
     if( ! hands.loadImage("hands.png")) printf("Hands loading failed");
     
+    if (portrait) {
+        if( ! bg.loadImage("london-eye-portrait.png")) printf("Bg loading failed");
+        hands.resize(900, 480);
+        sky.resize(7807, 1800);
+        sky2.resize(7807, 1800);
+    }
+    else {
+        if( ! bg.loadImage("london-eye.png")) printf("Bg loading failed");
+        hands.resize(1390, 742);
+    }
+    
     logo.resize(150, 150);
-    hands.resize(1390, 742);
 
 	font.loadFont("bebasneue-webfont.ttf", 20);
     
@@ -37,7 +48,7 @@ void ofApp::setup()
 	nearThreshold = 100;
     farThreshold = 1300;
     strokeWidth = 8.0f;
-    blurAmount = 20;
+    blurAmount = 15;
     totalParticles = 0;
     currentTime = 0;
     maxIdleTime = 600;
@@ -80,13 +91,21 @@ void ofApp::update()
 
         lHandOld.x = lHand.x;
         lHandOld.y = lHand.y;
-        lHand.x = tracked->projectPos.x * (ofGetWidth() / 640);
-        lHand.y = tracked->projectPos.y * (ofGetHeight() / 480);
-
         rHandOld.x = rHand.x;
         rHandOld.y = rHand.y;
-        rHand.x = tracked2->projectPos.x * (ofGetWidth() / 640);
-        rHand.y = tracked2->projectPos.y * (ofGetHeight() / 480);
+        
+        if (portrait) {
+            lHand.x = tracked->projectPos.x * (ofGetWidth() / 480);
+            lHand.y = tracked->projectPos.y * (ofGetHeight() / 640);
+            rHand.x = tracked2->projectPos.x * (ofGetWidth() / 480);
+            rHand.y = tracked2->projectPos.y * (ofGetHeight() / 640);
+        }
+        else {
+            lHand.x = tracked->projectPos.x * (ofGetWidth() / 640);
+            lHand.y = tracked->projectPos.y * (ofGetHeight() / 480);
+            rHand.x = tracked2->projectPos.x * (ofGetWidth() / 640);
+            rHand.y = tracked2->projectPos.y * (ofGetHeight() / 480);
+        }
         
         totalParticles = 0;
 
@@ -126,7 +145,7 @@ void ofApp::update()
             finale.play();
         }
         
-        if (fireworks.size() < 2 && !crowd.getIsPlaying()) {
+        if (fireworks.size() < 3 && !crowd.getIsPlaying()) {
             crowd.play();
         }
         
@@ -138,7 +157,7 @@ void ofApp::update()
             if (currentTime > maxIdleTime) {
                 currentTime = 0;
                 started = false;
-                blurAmount = 20;
+                blurAmount = 15;
                 blurEnabled = true;
             }
         }
@@ -210,15 +229,15 @@ void ofApp::draw()
         {
             lSensor = lSensor - 3;
             ofSetColor(255, 255, 255, lSensor);
-            ofCircle(ofGetWidth() - 400, ofGetHeight() + 300, 400);
-            font.drawString("Right hand", ofGetWidth() - 440, ofGetHeight() - 40);
+            ofCircle(ofGetWidth()/4, ofGetHeight() + 300, 400);
+            font.drawString("Left hand", (ofGetWidth()/4) - 43, ofGetHeight() - 40);
         }
         if( rSensor > 0 )
         {
             rSensor = rSensor - 3;
             ofSetColor(255, 255, 255, rSensor);
-            ofCircle(400, ofGetHeight() + 300, 400);
-            font.drawString("Left hand", 360, ofGetHeight() - 40);
+            ofCircle((ofGetWidth() - ofGetWidth()/4), ofGetHeight() + 300, 400);
+            font.drawString("Right hand", (ofGetWidth() - ofGetWidth()/4) - 43, ofGetHeight() - 40);
         }
     }
     
@@ -227,11 +246,12 @@ void ofApp::draw()
     if( !started )
     {
         logo.draw((ofGetWidth()/2 - logo.width/2), 50);
-        hands.draw((ofGetWidth()/2 - hands.width/2), 300);
+        hands.draw((ofGetWidth()/2 - hands.width/2), (ofGetHeight()/2 - hands.height/2));
         
         font.drawString("Sapient Fireworks", ofGetWidth()/2 - 85, 270);
         font.drawString("A Kinect hand tracking demo", ofGetWidth()/2 - 137, 310);
-        font.drawString("Show your hands until you can move both green dots, then lift your hands to start your fireworks show!", ofGetWidth()/2 - 550, ofGetHeight() - 80);
+        font.drawString("Show your hands until you can move both green dots", ofGetWidth()/2 - 266, ofGetHeight() - 120);
+        font.drawString("Then lift your hands to start your fireworks show!", ofGetWidth()/2 - 260, ofGetHeight() - 80);
         
         ofFill();
         ofSetColor(0, 255, 0);

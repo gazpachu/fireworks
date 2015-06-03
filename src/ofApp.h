@@ -26,7 +26,7 @@ class ofApp : public ofBaseApp
 
         int lSensor, rSensor, nearThreshold, farThreshold, blurAmount, skyPos, sky2Pos, cloudPos, cloud2Pos, cloud3Pos, currentTime, totalParticles, maxIdleTime;
         float strokeWidth, skyVel, cloudVel;
-        bool started, ready, blurEnabled, showInfo;
+        bool started, ready, blurEnabled, showInfo, portrait;
 
         ofxOpenNIContext niContext;
         ofxHandGenerator* niHandGenerator;
