@@ -120,34 +120,16 @@ void ofApp::update()
         }
 
         if( fireworks.size() < 40 && lHand.y + 50 < lHandOld.y )
-        {
-            Firework newFirework;
-            newFirework.init( lHand.x, lHand.y - 100 );
-            fireworks.push_back( newFirework );
-
-            lSensor = 200;
-            started = true;
-            currentTime = 0;
-        }
+            createFirework(lHand.x, lHand.y - 100);
 
         if( fireworks.size() < 40 && rHand.y + 50 < rHandOld.y )
-        {
-            Firework newFirework;
-            newFirework.init( rHand.x, rHand.y - 100 );
-            fireworks.push_back( newFirework );
-
-            rSensor = 200;
-            started = true;
-            currentTime = 0;
-        }
+            createFirework(rHand.x, rHand.y - 100);
         
-        if (fireworks.size() > 5 && !finale.getIsPlaying()) {
+        if (fireworks.size() > 5 && !finale.getIsPlaying())
             finale.play();
-        }
         
-        if (fireworks.size() < 3 && !crowd.getIsPlaying()) {
+        if (fireworks.size() < 3 && !crowd.getIsPlaying())
             crowd.play();
-        }
         
         if( started) {
             blurAmount = 0;
@@ -191,7 +173,7 @@ void ofApp::draw()
     cloud3.draw(cloud3Pos, 50);
     bg.draw(0,0);
     
-    ofSetColor(255,255,255,70);
+    ofSetColor(255,255 - (totalParticles/4),255  - (totalParticles/4),70);
     logo.draw((ofGetWidth()/2 - logo.width/2), 50);
     ofSetColor(255,255,255,255);
     
@@ -230,14 +212,14 @@ void ofApp::draw()
             lSensor = lSensor - 3;
             ofSetColor(255, 255, 255, lSensor);
             ofCircle(ofGetWidth()/4, ofGetHeight() + 300, 400);
-            font.drawString("Left hand", (ofGetWidth()/4) - 43, ofGetHeight() - 40);
+            font.drawString("Glassmill", (ofGetWidth()/4) - 43, ofGetHeight() - 40);
         }
         if( rSensor > 0 )
         {
             rSensor = rSensor - 3;
             ofSetColor(255, 255, 255, rSensor);
             ofCircle((ofGetWidth() - ofGetWidth()/4), ofGetHeight() + 300, 400);
-            font.drawString("Right hand", (ofGetWidth() - ofGetWidth()/4) - 43, ofGetHeight() - 40);
+            font.drawString("Eden House", (ofGetWidth() - ofGetWidth()/4) - 50, ofGetHeight() - 40);
         }
     }
     
@@ -250,14 +232,31 @@ void ofApp::draw()
         
         font.drawString("Sapient Fireworks", ofGetWidth()/2 - 85, 270);
         font.drawString("A Kinect hand tracking demo", ofGetWidth()/2 - 137, 310);
-        font.drawString("Show your hands until you can move both green dots", ofGetWidth()/2 - 266, ofGetHeight() - 120);
+        font.drawString("Show and move a bit your hands until you can see green dots or the demo starts", ofGetWidth()/2 - 415 , ofGetHeight() - 120);
         font.drawString("Then lift your hands to start your fireworks show!", ofGetWidth()/2 - 260, ofGetHeight() - 80);
         
-        ofFill();
-        ofSetColor(0, 255, 0);
-        ofCircle(lHand.x, lHand.y, 15);
-        ofCircle(rHand.x, rHand.y, 15);
+        if (lHand.y > 0 || rHand.y > 0) {
+            ofFill();
+            ofSetColor(0, 255, 0);
+            ofCircle(lHand.x, lHand.y, 15);
+            ofCircle(rHand.x, rHand.y, 15);
+        }
     }
+}
+
+void ofApp::createFirework(int xPos, int yPos)
+{
+    Firework newFirework;
+    newFirework.init( xPos, yPos );
+    fireworks.push_back( newFirework );
+    
+    if(xPos > ofGetWidth() / 2)
+        rSensor = 200;
+    else
+        lSensor = 200;
+    
+    started = true;
+    currentTime = 0;
 }
 
 void ofApp::updateSky()
